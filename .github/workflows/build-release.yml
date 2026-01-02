@@ -29,3 +29,12 @@ jobs:
       with:
         tag: auto-${{ github.run_id }}
         name: Auto Build ${{ github.run_number }}
+    - name: Zip output
+      run: |
+        Compress-Archive -Path out/* -DestinationPath AbyssClient.zip
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AbyssClient
+        path: AbyssClient.zip
