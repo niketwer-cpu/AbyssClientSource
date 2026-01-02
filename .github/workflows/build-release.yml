@@ -1,0 +1,43 @@
+name: Build Windows Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Create Release
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet publish -c Release -o out
+
+    - name: Create Release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: 'v1.0.${{ github.run_number }}'
+        name: 'Client Build ${{ github.run_number }}'
+        draft: false
+        prerelease: false
+
+    - name: Upload build
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out
+        asset_name: AbyssClientBuild.zip
+        asset_content_type: application/zip
